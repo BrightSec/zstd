@@ -163,7 +163,8 @@ MEM_STATIC size_t ZSTD_decompressLegacy(
             {   size_t result;
                 ZSTDv05_DCtx* const zd = ZSTDv05_createDCtx();
                 if (zd==NULL) return ERROR(memory_allocation);
-                result = ZSTDv05_decompress_usingDict(zd, dst, dstCapacity, src, compressedSize, dict, dictSize);
+                /* v0.5 dictionary loader reads a 4-byte magic: ignore dictionaries too short to hold one */
+                result = ZSTDv05_decompress_usingDict(zd, dst, dstCapacity, src, compressedSize, dict, (dictSize < 4) ? 0 : dictSize);
                 ZSTDv05_freeDCtx(zd);
                 return result;
             }
@@ -173,7 +174,8 @@ MEM_STATIC size_t ZSTD_decompressLegacy(
             {   size_t result;
                 ZSTDv06_DCtx* const zd = ZSTDv06_createDCtx();
                 if (zd==NULL) return ERROR(memory_allocation);
-                result = ZSTDv06_decompress_usingDict(zd, dst, dstCapacity, src, compressedSize, dict, dictSize);
+                /* v0.6 dictionary loader reads a 4-byte magic: ignore dictionaries too short to hold one */
+                result = ZSTDv06_decompress_usingDict(zd, dst, dstCapacity, src, compressedSize, dict, (dictSize < 4) ? 0 : dictSize);
                 ZSTDv06_freeDCtx(zd);
                 return result;
             }
